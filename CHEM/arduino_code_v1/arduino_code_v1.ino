@@ -1,3 +1,5 @@
+#include <Enes100.h>
+
 /*
  * finley XAND stephen
  * 
@@ -71,11 +73,13 @@ void loop() {//this is main?
 }
 
 void stopOSV(){
+  enes.println("Stopping");
   motor1Brake();
   motor2Brake();
 }
 
 void moveForward(){
+  enes.println("Moving forward");
   motor1Forward(motorSpeed);
   motor2Forward(motorSpeed);
 }
@@ -85,11 +89,13 @@ void updated(){
 }
 
 void rotateCW(){
+  enes.println("Turning clockwise");
   motor1Forward(motorSpeed);
   motor2Backward(motorSpeed);
 }
 
 void rotateCCW(){
+  enes.println("Turning counterclockwise");
   motor2Forward(motorSpeed);
   motor1Backward(motorSpeed);
 }
@@ -202,6 +208,7 @@ boolean wallInFront(){
 
 void avoidObstacle(){
   if(isBlocked()){
+    enes.println("Encountered obstacle");
     stopOSV();
     if(enes.location.y<0.5 || (enes.location.y < 1.5 &&random(1)>0.5){
       turnToUp();
