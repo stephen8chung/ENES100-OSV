@@ -15,13 +15,13 @@
 *NOTE: dont avoid mission site
 *loop v setup
 */
-const int IN1=5;
-const int IN2=4;
-const int ENA=6;
+const int IN1=9;
+const int IN2=8;
+const int ENA=10;
 
-const int IN3=8;
-const int IN4=7;
-const int ENB=9;
+const int IN3=12;
+const int IN4=13;
+const int ENB=11;
 
 const int motorSpeed = 400;
 
@@ -53,14 +53,13 @@ void setup() {
 
 void loop() {//this is main?
   //adjusting y direction
-  updated();
-  moveToDesY();
-  turnToZero();
+up  moveToDesY();
+  turnToRight();
   enes.println("At correct y, moving to correct x."); 
   //adjusting x direction
   //move until passed rocks
   updated();
-  while(enes.location.x<rocksEndLocaiton){
+  while(enes.location.x<rocksEndLocation){
     updated();
     moveForward();
     avoidObstacle();
@@ -145,15 +144,15 @@ void moveToDesY(){
   else{
     turnToDown();
   }
-  while(!isBlocked() && abs(enes.location.y - enes.destination) >0.5){
+  while(!isBlocked() && abs(enes.location.y - enes.destination.y) >0.5){
     moveForward();
     updated();
   }
   if(isBlocked()){
-    turnRight()
+    turnToRight();
     updated();
     float startLocation = enes.location.x;
-    while(abs(enes.location.x - startl=Location)<0.2 && !isBlocked()){
+    while(abs(enes.location.x - startLocation)<0.2 && !isBlocked()){
       updated();
       moveForward();
     }
@@ -162,7 +161,7 @@ void moveToDesY(){
 }
 
 void turnToUp(){//do initial check for theta
-  while(!(enes.location.theta>1.55 && enes.location.theta <1.59){
+  while(!(enes.location.theta>1.55 && enes.location.theta <1.59)){
     updated();
     rotateCCW();
   }
@@ -179,15 +178,15 @@ void turnToDown(){//do check for initial theta for speed
 
 void turnToRight(){
   if(enes.location.theta < 0){
-    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2){
+    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2)){
       updated();
-      rotatCCW();
+      rotateCCW();
     }
   }
   else{
-    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2){
+    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2)){
       updated();
-      rotatCW();
+      rotateCW();
     }
   }
   stopOSV();
@@ -203,16 +202,16 @@ boolean isPathClear(){//call sensor data
 
 boolean wallInFront(){
   updated();
-  return (enes.location.y<0.3 && enes.location.theta<0.79) || (enes.location.y >1.7 && enes.location.theta>0.79)
+  return (enes.location.y<0.3 && enes.location.theta<0.79) || (enes.location.y >1.7 && enes.location.theta>0.79);
 }
 
 void avoidObstacle(){
   if(isBlocked()){
     enes.println("Encountered obstacle");
     stopOSV();
-    if(enes.location.y<0.5 || (enes.location.y < 1.5 &&random(1)>0.5){
+    if(enes.location.y<0.5 || (enes.location.y < 1.5 &&random(1)>0.5)){
       turnToUp();
-      if(pathIsClear() &&!wallInFront()){
+      if(isPathClear() &&!wallInFront()){
         turnToDown();
       }
     }
@@ -233,7 +232,7 @@ void avoidObstacle(){
     turnToRight();
     updated();
     startLocation = enes.location.x;
-    while(abs(enes.location.x-startLocation)<0.8 && !isBlocaked()){
+    while(abs(enes.location.x-startLocation)<0.8 && !isBlocked()){
       updated();
       moveForward();
     }
