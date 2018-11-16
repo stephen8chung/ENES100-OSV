@@ -1,5 +1,3 @@
-#include <Enes100.h>
-
 /*
  * finley XAND stephen
  * 
@@ -7,29 +5,24 @@
 *AKA
 *THE FINAL CO(de)UNTDOWN
 *
-*NOTE: wait until over rocks for checking obstacle
-*NOTE: loaction and adjust after rocks
-*NOTE: side sensors and stuff
-*NOTE: speedyboi osv, turn until clear then full send set dist, then orient in direction of dest
-*AVG time and success rate
-*NOTE: dont avoid mission site
-*loop v setup
+*note: dont plug rf into 0 and 1 until after the code sucessfuly uploaded to the arduino board
+*note: WE NEED TO ADD CODE FOR THE MF DISTANCE SENSOR BOIS
 */
-const int IN1=5;
-const int IN2=4;
-const int ENA=6;
+const int IN1=9;
+const int IN2=8;
+const int ENA=10;
 
-const int IN3=8;
-const int IN4=7;
-const int ENB=9;
+const int IN3=12;
+const int IN4=13;
+const int ENB=11;
 
-const int motorSpeed = 400;
+const int motorSpeed = 200;
 
-const float rocksEndLocation = 0.0;
+const float rocksEndLocation = 2.0;//may need to change this, dependent on end location of rocky bois
 
 
 
-Enes100 enes("Mad Scienctists", CHEMICAL, 7, 10, 11);
+Enes100 enes("Mad Scienctists", CHEMICAL, 7, 0, 1);
 
 void setup() {
   pinMode(IN1, OUTPUT);//motors
@@ -51,7 +44,7 @@ void setup() {
   
 }
 
-void loop() {//this is main?
+void loop() {//this is main.
   //adjusting y direction
   updated();
   moveToDesY();
@@ -63,9 +56,16 @@ void loop() {//this is main?
   while(enes.location.x<rocksEndLocaiton){
     updated();
     moveForward();
+  }
+  enes.println("past the rocky bois");
+  stopOSV();
+  while(enes.location.x<(enes.destination.x-0.2)){
+    updated();
+    moveForward();
     avoidObstacle();
   }
-  stopOSV();
+
+  
 
   //base mission execution
   
@@ -73,13 +73,11 @@ void loop() {//this is main?
 }
 
 void stopOSV(){
-  enes.println("Stopping");
   motor1Brake();
   motor2Brake();
 }
 
 void moveForward(){
-  enes.println("Moving forward");
   motor1Forward(motorSpeed);
   motor2Forward(motorSpeed);
 }
@@ -89,13 +87,11 @@ void updated(){
 }
 
 void rotateCW(){
-  enes.println("Turning clockwise");
   motor1Forward(motorSpeed);
   motor2Backward(motorSpeed);
 }
 
 void rotateCCW(){
-  enes.println("Turning counterclockwise");
   motor2Forward(motorSpeed);
   motor1Backward(motorSpeed);
 }
@@ -208,7 +204,6 @@ boolean wallInFront(){
 
 void avoidObstacle(){
   if(isBlocked()){
-    enes.println("Encountered obstacle");
     stopOSV();
     if(enes.location.y<0.5 || (enes.location.y < 1.5 &&random(1)>0.5){
       turnToUp();
