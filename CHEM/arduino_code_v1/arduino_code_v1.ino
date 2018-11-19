@@ -12,6 +12,8 @@
 
 #include "Enes100.h"
 
+const int thePieceOfWodThatRepresentsOurLocationOnTopOfOurOSV = 7;
+
 const int IN1=9;
 const int IN2=8;
 const int ENA=10;
@@ -30,7 +32,7 @@ const int motorSpeed = 200;
 
 const float rocksEndLocation = 2.0;//may need to change this, dependent on end location of rocky bois
 
-Enes100 enes("Team Name Here", CHEMICAL, 3, 8, 9);
+Enes100 enes("MAD ZCIENTIZTZ", CHEMICAL, thePieceOfWodThatRepresentsOurLocationOnTopOfOurOSV, 0, 1);
 
 void setup() {
   pinMode(IN1, OUTPUT);//motors
