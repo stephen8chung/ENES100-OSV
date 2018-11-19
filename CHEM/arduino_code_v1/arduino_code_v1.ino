@@ -5,9 +5,13 @@
 *AKA
 *THE FINAL CO(de)UNTDOWN
 *
-*note: dont plug rf into 0 and 1 until after the code sucessfuly uploaded to the arduino board
-*note: WE NEED TO ADD CODE FOR THE MF DISTANCE SENSOR BOIS
+*NOTE: include location/angle/motion adjusters
+*AVG time and success rate
+*NOTE: dont avoid mission site!!!!!!!!!! try to figure this one out
 */
+
+#include "Enes100.h"
+
 const int IN1=9;
 const int IN2=8;
 const int ENA=10;
@@ -16,13 +20,17 @@ const int IN3=12;
 const int IN4=13;
 const int ENB=11;
 
+const int trigPin = 7;
+const int echoPinR = 6;
+const int echoPinL = 5;
+long duration;
+float m;
+
 const int motorSpeed = 200;
 
 const float rocksEndLocation = 2.0;//may need to change this, dependent on end location of rocky bois
 
-
-
-Enes100 enes("Mad Scienctists", CHEMICAL, 7, 0, 1);
+Enes100 enes("Team Name Here", CHEMICAL, 3, 8, 9);
 
 void setup() {
   pinMode(IN1, OUTPUT);//motors
@@ -32,6 +40,10 @@ void setup() {
   pinMode(IN4, OUTPUT);//Motors
   pinMode(IN3, OUTPUT);
   pinMode(ENB, OUTPUT);
+
+  pinMode(trigPin, OUTPUT);//distance sensors
+  pinMode(echoPinR, INPUT);
+  pinMode(echoPinL, INPUT);
 
   while (!enes.retrieveDestination()) {
     enes.println("Unable to retrieve location");
@@ -46,7 +58,8 @@ void setup() {
 
 void loop() {//this is main.
   //adjusting y direction
-up  moveToDesY();
+  updated();
+  moveToDesY();
   turnToRight();
   enes.println("At correct y, moving to correct x."); 
   //adjusting x direction
@@ -70,6 +83,8 @@ up  moveToDesY();
   
   //base mission transmission
 }
+
+
 
 void stopOSV(){
   motor1Brake();
@@ -189,11 +204,21 @@ void turnToRight(){
 }
 
 boolean isBlocked(){//call sensor data
-  
+   if(distanceRight()<0.2 && distanceLeft()<0.2){
+    return true;
+   }
+   else{
+    return false;
+   }
 }
 
 boolean isPathClear(){//call sensor data
-  
+  if(distanceRight()<0.5 && distanceLeft()<0.5){
+    return true;
+   }
+   else{
+    return false;
+   }
 }
 
 boolean wallInFront(){
@@ -240,4 +265,26 @@ void avoidObstacle(){
     moveToDesY();
     turnToRight();
   }
+}
+
+float distanceRight(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPinR, HIGH);
+  m = (2+(duration/2)/29.1)/100;
+  return m;
+}
+
+float distanceLeft(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPinL, HIGH);
+  m = (2+(duration/2)/29.1)/100;
+  return m;
 }
