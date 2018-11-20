@@ -11,6 +11,7 @@
 */
 
 #include "Enes100.h"
+#include <math.h>
 
 const int thePieceOfWodThatRepresentsOurLocationOnTopOfOurOSV = 7;
 
@@ -70,23 +71,29 @@ void loop() {//this is main.
   while(enes.location.x<rocksEndLocation){
     updated();
     moveForward();
+    delay(500);
+    stopOSV();
   }
   enes.println("past the rocky bois");
   stopOSV();
+  delay(500);
+  moveToDesY();
   while(enes.location.x<(enes.destination.x-0.2)){
     updated();
     moveForward();
     avoidObstacle();
+    delay(500 + (enes.destination.x - enes.location.x) * 1500);
+    stopOSV();
   }
-
-  
 
   //base mission execution
   
   //base mission transmission
 }
 
-
+boolean distanceToTime(float distance){//distance in meters, time in milliseconds
+  return distance / 3.1415926535897 / 0.12 / 30 * 60000;
+}
 
 void stopOSV(){
   motor1Brake();
@@ -159,6 +166,8 @@ void moveToDesY(){
   }
   while(!isBlocked() && abs(enes.location.y - enes.destination.y) >0.5){
     moveForward();
+    delay(500 + abs(enes.location.y - enes.destination.y) * 500);
+    stopOSV();
     updated();
   }
   if(isBlocked()){
@@ -168,6 +177,8 @@ void moveToDesY(){
     while(abs(enes.location.x - startLocation)<0.2 && !isBlocked()){
       updated();
       moveForward();
+      delay(500 + abs(enes.location.y - enes.destination.y) * 500);
+      stopOSV();
     }
   }
   stopOSV();
@@ -249,6 +260,8 @@ void avoidObstacle(){
     while(abs(enes.location.y-startLocation) < 0.5 && !isBlocked()){
       updated();
       moveForward();
+      delay(500);
+      stopOSV();
     }
 
     turnToRight();
@@ -257,6 +270,8 @@ void avoidObstacle(){
     while(abs(enes.location.x-startLocation)<0.8 && !isBlocked()){
       updated();
       moveForward();
+      delay(500);
+      stopOSV();
     }
 
     if(isBlocked()){
