@@ -15,6 +15,8 @@
 
 const int thePieceOfWodThatRepresentsOurLocationOnTopOfOurOSV = 7;
 
+const float toleranceRad = 0.05;
+
 const int IN1=9;
 const int IN2=8;
 const int ENA=10;
@@ -185,32 +187,94 @@ void moveToDesY(){
 }
 
 void turnToUp(){//do initial check for theta
-  while(!(enes.location.theta>1.55 && enes.location.theta <1.59)){
-    updated();
-    rotateCCW();
-  }
-  stopOSV();
-}
-
-void turnToDown(){//do check for initial theta for speed
-  while(!(enes.location.theta>-1.59 && enes.location.theta < -1.55)){
-    updated();
-    rotateCW();
-  }
-  stopOSV();
-}
-
-void turnToRight(){
-  if(enes.location.theta < 0){
-    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2)){
+  updated();
+  if(abs(enes.location.theta)<(PI/2)){//check current theta
+    while(!(enes.location.theta < ((PI/2)+toleranceRad))){//turns until passes tolerance
       updated();
       rotateCCW();
     }
-  }
-  else{
-    while(!(abs(enes.location.theta)>-0.02 && abs(enes.location.theta)<0.2)){
+    while(!(enes.location.theta>((PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
       updated();
       rotateCW();
+    }
+    if(!(enes.location.theta < ((PI/2)+toleranceRad) && (enes.location.theta>((PI/2)-toleranceRad)))){
+      turnToUp();//recursive call
+    }
+    stopOSV();
+  }
+  else{//does same in opposite direction
+    while(!(enes.location.theta>((PI/2)-toleranceRad))){
+      updated();
+      rotateCW();
+    }
+    while(!(enes.location.theta < ((PI/2)+toleranceRad))){
+      updated();
+      rotateCCW();
+    }
+    if(!(enes.location.theta < ((PI/2)+toleranceRad) && (enes.location.theta>((PI/2)-toleranceRad)))){
+      turnToUp();//recursive call
+    }
+    stopOSV();
+  }
+}
+
+void turnToDown(){//do check for initial theta for speed
+  updated();
+  if(abs(enes.location.theta)<(PI/2)){//check current theta
+    while(!(enes.location.theta < (-1*(PI/2)+toleranceRad))){//turns until passes tolerance
+      updated();
+      rotateCW();
+    }
+    while(!(enes.location.theta>(-1*(PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
+      updated();
+      rotateCCW();
+    }
+    if(!(enes.location.theta < (-1*(PI/2)+toleranceRad) && (enes.location.theta>(-1*(PI/2)-toleranceRad)))){
+      turnToDown();//recursive call
+    }
+    stopOSV();
+  }
+  else{//does same in opposite direction
+    while(!(enes.location.theta>(-1*(PI/2)-toleranceRad))){
+      updated();
+      rotateCCW();
+    }
+    while(!(enes.location.theta < (-1*(PI/2)+toleranceRad))){
+      updated();
+      rotateCW();
+    }
+    if(!(enes.location.theta < (-1*(PI/2)+toleranceRad) && (enes.location.theta>(-1*(PI/2)-toleranceRad)))){
+      turnToDown();//recursive call
+    }
+    stopOSV();
+  }
+}
+
+void turnToRight(){
+  if(enes.location.theta < 0){//check current location
+    while(!(abs(enes.location.theta)<(toleranceRad))){
+      updated();
+      rotateCCW();
+    }
+    while(!(abs(enes.location.theta)>(-1*toleranceRad))){
+      updated();
+      rotateCW();
+    }
+    if(!(abs(enes.location.theta)>(-1*toleranceRad) && abs(enes.location.theta)<(toleranceRad))){
+      turnToRight();//recursively call to check again if not in constraints
+    }
+  }
+  else{
+    while(!(abs(enes.location.theta)>(-1*toleranceRad))){
+      updated();
+      rotateCW();
+    }
+    while(!(abs(enes.location.theta)<(toleranceRad))){
+      updated();
+      rotateCCW();
+    }
+    if(!(abs(enes.location.theta)>(-1*toleranceRad) && abs(enes.location.theta)<(toleranceRad))){
+      turnToRight();//recursively call to check again if not in constraints
     }
   }
   stopOSV();
