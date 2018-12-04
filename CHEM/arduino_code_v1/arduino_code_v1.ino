@@ -13,15 +13,15 @@
 #include "Enes100.h"
 #include <math.h>
 
-const int thePieceOfWoodThatRepresentsOurLocationOnTopOfOurOSV = 7;
+const int thePieceOfWoodThatRepresentsOurLocationOnTopOfOurOSV = 3u;
 
 const float toleranceRad = 0.05;
 
-const int IN1=9;//left motor
+const int IN1=9;//right motor
 const int IN2=8;
 const int ENA=10;
 
-const int IN3=12;//right motor
+const int IN3=12;//left motor
 const int IN4=13;
 const int ENB=11;
 
@@ -50,22 +50,23 @@ void setup() {
 
   pinMode(trigPin, OUTPUT);//distance sensors
   pinMode(echoPinR, INPUT);
-  pinMode(echoPinL, INPUT);  
+  pinMode(echoPinL, INPUT);
+  while(!enes.retrieveDestination());  
   updated();
   enes.print("DESTINATION : ");
   enes.print(enes.destination.y);
   enes.print(",");
   enes.println(enes.destination.x);
-  enes.print("LOCATION : ");
-  enes.print(enes.location.x);
-  enes.print(",");
-  enes.println(enes.location.y);
   
   
 }
 
 void loop() {//this is main.
-  //adjusting y direction
+  moveForward();
+  moveForward();
+  delay(1000);
+  stopOSV();
+  ///adjusting y direction
   updated();
   moveToDesY();
   turnToRight();
@@ -95,6 +96,7 @@ void loop() {//this is main.
   //base mission execution
   
   //base mission transmission
+  while(1);
 }
 
 boolean distanceToTime(float distance){//distance in meters, time in milliseconds
