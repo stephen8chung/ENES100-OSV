@@ -25,6 +25,10 @@ const int IN3=12;//left motor
 const int IN4=13;
 const int ENB=11;
 
+const int PUMP1=15;//Pump motor
+const int PUMP2=16;
+const int ENPUMP=17;
+
 const int trigPin = 7;
 const int echoPinR = 6;
 const int echoPinL = 5;
@@ -47,6 +51,10 @@ void setup() {
   pinMode(IN4, OUTPUT);//Motors
   pinMode(IN3, OUTPUT);
   pinMode(ENB, OUTPUT);
+
+  pinMode(PUMP1, OUTPUT);//Pump motors
+  pinMode(PUMP2, OUTPUT);
+  pinMode(ENPUMP, OUTPUT);
 
   pinMode(trigPin, OUTPUT);//distance sensors
   pinMode(echoPinR, INPUT);
@@ -402,4 +410,15 @@ float distanceLeft(){
   duration = pulseIn(echoPinL, HIGH);
   m = (2+(duration/2)/29.1)/100;
   return m;
+}
+
+void startPump(){
+  digitalWrite(IN1,LOW); 
+  digitalWrite(IN2,HIGH);  
+  analogWrite(ENB,255);
+}
+
+void stopPump(){
+  digitalWrite(IN1,LOW); 
+  digitalWrite(IN2,LOW);
 }
