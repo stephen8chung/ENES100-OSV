@@ -13,15 +13,15 @@
 #include "Enes100.h"
 #include <math.h>
 
-const int thePieceOfWoodThatRepresentsOurLocationOnTopOfOurOSV = 3u;
+const int thePieceOfWoodThatRepresentsOurLocationOnTopOfOurOSV = 7;
 
 const float toleranceRad = 0.05;
 
-const int IN1=9;//right motor
+const int IN1=9;//left motor
 const int IN2=8;
 const int ENA=10;
 
-const int IN3=12;//left motor
+const int IN3=12;//right motor
 const int IN4=13;
 const int ENB=11;
 
@@ -39,7 +39,7 @@ const int echoPinL = 5;
 long duration;
 float m;
 
-const int motorSpeed = 127;
+const int motorSpeed =  255;
 
 const float rocksEndLocation = 2.0;//may need to change this, dependent on end location of rocky bois
 
@@ -56,33 +56,40 @@ void setup() {
   pinMode(IN3, OUTPUT);
   pinMode(ENB, OUTPUT);
 
-  pinMode(PUMP1, OUTPUT);//Pump motors
-  pinMode(PUMP2, OUTPUT);
-  pinMode(ENPUMP, OUTPUT);
-
   pinMode(trigPin, OUTPUT);//distance sensors
   pinMode(echoPinR, INPUT);
-  pinMode(echoPinL, INPUT);
-
-  Serial.begin(9600);
-  Serial.println("Begin pH sensing");
-  
-  dropArm();
-  startPump();
-  delay(20000);
-  stopPump();
-  
+  pinMode(echoPinL, INPUT);  
 }
 
 void loop() {//this is main.
-  readpH();
-  //startPump();
+  //adjusting y direction
+  updated();
+//  moveToDesY();
+//  turnToRight();
+//  enes.println("At correct y, moving to correct x."); 
+//  //adjusting x direction
+//  //move until passed rocks
+//  updated();
+  moveForward();
+  delay(distanceToTime(1.0));
+//  enes.println("past the rocky bois");
+//  stopOSV();
+//  delay(500);
+//  while(enes.location.x<(enes.destination.x-0.2)){
+//    updated();
+//    moveForward();
+//    avoidObstacle();
+//    delay(500 + (enes.destination.x - enes.location.x) * 1500);
+//    stopOSV();
+//  }
+  stopOSV();
+  while(1);
   //base mission execution
   
   //base mission transmission
 }
 
-boolean distanceToTime(float distance){//distance in meters, time in milliseconds
+float distanceToTime(float distance){//distance in meters, time in milliseconds
   return distance / 3.1415926535897 / 0.12 / 30 * 60000;
 }
 
@@ -98,6 +105,7 @@ void moveForward(){
 
 void updated(){
   while (!enes.updateLocation());
+  while (!enes.retrieveDestination());
   enes.print("LOCATION : ");
   enes.print(enes.location.x);
   enes.print(",");
@@ -116,39 +124,33 @@ void rotateCCW(){
   motorLBackward(motorSpeed);
 }
 
-void motorLForward(int Speed) 
-{
+void motorLForward(int Speed){
      digitalWrite(IN3,HIGH); 
      digitalWrite(IN4,LOW);  
-     analogWrite(ENA,Speed);
+     analogWrite(ENB,Speed);
 }
   
-void motorLBackward(int Speed) 
-{    
+void motorLBackward(int Speed){    
      digitalWrite(IN3,LOW); 
      digitalWrite(IN4,HIGH);  
-     analogWrite(ENA,Speed);
+     analogWrite(ENB,Speed);
 }
-void motorLBrake()      
-{
+void motorLBrake(){
      digitalWrite(IN3,LOW); 
      digitalWrite(IN4,LOW); 
 }     
-void motorRForward(int Speed) 
-{
+void motorRForward(int Speed){
      digitalWrite(IN1,LOW); 
      digitalWrite(IN2,HIGH);  
-     analogWrite(ENB,Speed);
+     analogWrite(ENA,Speed);
 }
   
-void motorRBackward(int Speed) 
-{    
+void motorRBackward(int Speed){    
      digitalWrite(IN1,HIGH); 
      digitalWrite(IN2,LOW);  
-     analogWrite(ENB,Speed);
+     analogWrite(ENA,Speed);
 }
-void motorRBrake()
-{
+void motorRBrake(){
      digitalWrite(IN1,LOW); 
      digitalWrite(IN2,LOW); 
 }
@@ -181,8 +183,8 @@ void moveToDesY(){
       updated();
       moveForward();
       enes.print(enes.location.x);
-    enes.print(",");
-    enes.println(enes.location.y);
+      enes.print(",");
+      enes.println(enes.location.y);
     }
   }
   stopOSV();
@@ -196,14 +198,14 @@ void turnToUp(){//do initial check for theta
       rotateCCW();
       enes.println(enes.location.theta);
     }
-    /*while(!(enes.location.theta>((PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
+    while(!(enes.location.theta>((PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
       updated();
       rotateCW();
       enes.println(enes.location.theta);
     }
     if(!(enes.location.theta < ((PI/2)+toleranceRad) && (enes.location.theta>((PI/2)-toleranceRad)))){
       turnToUp();//recursive call
-    }*/
+    }
     stopOSV();
   }
   else{//does same in opposite direction
@@ -212,14 +214,14 @@ void turnToUp(){//do initial check for theta
       rotateCW();
       enes.println(enes.location.theta);
     }
-    /*while(!(enes.location.theta < ((PI/2)+toleranceRad))){
+    while(!(enes.location.theta < ((PI/2)+toleranceRad))){
       updated();
       rotateCCW();
       enes.println(enes.location.theta);
     }
     if(!(enes.location.theta < ((PI/2)+toleranceRad) && (enes.location.theta>((PI/2)-toleranceRad)))){
       turnToUp();//recursive call
-    }*/
+    }
     stopOSV();
   }
   
@@ -233,14 +235,14 @@ void turnToDown(){//do check for initial theta for speed
       rotateCW();
       enes.println(enes.location.theta);
     }
-    /*while(!(enes.location.theta>(-1*(PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
+    while(!(enes.location.theta>(-1*(PI/2)-toleranceRad))){//turns back until in tolerance if out of tolerance
       updated();
       rotateCCW();
       enes.println(enes.location.theta);
     }
     if(!(enes.location.theta < (-1*(PI/2)+toleranceRad) && (enes.location.theta>(-1*(PI/2)-toleranceRad)))){
       turnToDown();//recursive call
-    }*/
+    }
     stopOSV();
   }
   else{//does same in opposite direction
@@ -249,14 +251,14 @@ void turnToDown(){//do check for initial theta for speed
       rotateCCW();
       enes.println(enes.location.theta);
     }
-    /*while(!(enes.location.theta < (-1*(PI/2)+toleranceRad))){
+    while(!(enes.location.theta < (-1*(PI/2)+toleranceRad))){
       updated();
       rotateCW();
       enes.println(enes.location.theta);
     }
     if(!(enes.location.theta < (-1*(PI/2)+toleranceRad) && (enes.location.theta>(-1*(PI/2)-toleranceRad)))){
       turnToDown();//recursive call
-    }*/
+    }
     stopOSV();
   }
 }
@@ -268,14 +270,14 @@ void turnToRight(){
       enes.println(enes.location.theta);
       rotateCCW();
     }
-    /*while(!(abs(enes.location.theta)>(-1*toleranceRad))){
+    while(!(abs(enes.location.theta)>(-1*toleranceRad))){
       updated();
       rotateCW();
       enes.println(enes.location.theta);
     }
     if(!(abs(enes.location.theta)>(-1*toleranceRad) && abs(enes.location.theta)<(toleranceRad))){
       turnToRight();//recursively call to check again if not in constraints
-    }*/
+    }
     stopOSV();
   }
   else{
@@ -284,7 +286,7 @@ void turnToRight(){
       rotateCW();
       enes.println(enes.location.theta);
     }
-    /*while(!(abs(enes.location.theta)<(toleranceRad))){
+    while(!(abs(enes.location.theta)<(toleranceRad))){
       updated();
       rotateCCW();
       enes.println(enes.location.theta);
@@ -292,7 +294,6 @@ void turnToRight(){
     if(!(abs(enes.location.theta)>(-1*toleranceRad) && abs(enes.location.theta)<(toleranceRad))){
       turnToRight();//recursively call to check again if not in constraints
     }
-    */
     stopOSV();
   }
 }
@@ -386,7 +387,6 @@ float distanceLeft(){
   m = (2+(duration/2)/29.1)/100;
   return m;
 }
-
 void startPump(){
   digitalWrite(PUMP1,LOW); 
   digitalWrite(PUMP2,HIGH);  
@@ -410,5 +410,6 @@ void readpH(){
   float reading = analogRead(A0);
   Serial.print(reading);
   Serial.print("  ");
-  Serial.println(0.01883 * reading - 0.06206);
+  enes.println(0.01883 * reading - 0.06206);
 }
+ 
